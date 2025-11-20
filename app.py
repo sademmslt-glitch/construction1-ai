@@ -61,10 +61,27 @@ with col2:
     workers = st.number_input("Number of Workers", min_value=1, max_value=2000, value=20, step=1)
     duration = st.number_input("Expected Duration (months)", min_value=1, max_value=120, value=12, step=1)
 
-# Sample presets
+# Sample presets using session_state (safer than experimental_rerun)
+if "size" not in st.session_state:
+    st.session_state["size"] = 1000
+if "workers" not in st.session_state:
+    st.session_state["workers"] = 20
+if "budget" not in st.session_state:
+    st.session_state["budget"] = 500000
+if "duration" not in st.session_state:
+    st.session_state["duration"] = 12
+
 if st.button("Use example project"):
-    size, workers, budget, duration = 1200, 25, 600000, 14
-    st.experimental_rerun()
+    st.session_state["size"] = 1200
+    st.session_state["workers"] = 25
+    st.session_state["budget"] = 600000
+    st.session_state["duration"] = 14
+
+# Then use session_state values as defaults for inputs:
+size = st.number_input("Project Size (m²)", min_value=1, max_value=100000, value=st.session_state.get("size", 1000), step=1)
+budget = st.number_input("Estimated Budget (SAR)", min_value=1, max_value=10_000_000_000, value=st.session_state.get("budget", 500000), step=1000)
+workers = st.number_input("Number of Workers", min_value=1, max_value=2000, value=st.session_state.get("workers", 20), step=1)
+duration = st.number_input("Expected Duration (months)", min_value=1, max_value=120, value=st.session_state.get("duration", 12), step=1)
 
 # validation
 errors = validate_inputs(size, workers, budget, duration)
